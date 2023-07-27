@@ -1,0 +1,60 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: middlewares.traefik.io
+  namespace: kube-system
+spec:
+  group: traefik.io
+  names:
+    kind: Middleware
+    listKind: MiddlewareList
+    plural: middlewares
+    singular: middleware
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'Middleware is the CRD implementation of a Traefik Middleware.
+          More info: https://doc.traefik.io/traefik/v2.10/middlewares/http/overview/'
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MiddlewareSpec defines the desired state of a Middleware.
+            properties:
+              addPrefix:
+                description: 'AddPrefix holds the add prefix middleware configuration.
+                  This middleware updates the path of a request before forwarding
+                  it. More info: https://doc.traefik.io/traefik/v2.10/middlewares/http/addprefix/'
+                properties:
+                  prefix:
+                    description: Prefix is the string to add before the current path
+                      in the requested URL. It should include a leading slash (/).
+                    type: string
+                type: object
+            type: object
+        required:
+        - metadata
+        - spec
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: Middleware
+    listKind: MiddlewareList
+    plural: middlewares
+    singular: middleware
+  storedVersions:
+  - v1alpha1

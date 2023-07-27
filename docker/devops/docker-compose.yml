@@ -1,0 +1,118 @@
+version: '2'
+
+services:
+  config-server:
+    image: config-image
+    container_name: config-server
+    mem_limit: 512M
+    volumes:
+     - /home/pndiaye/petclinic/localrepo:/localrepo
+    networks:
+     - petclinic_network
+    expose:
+     - 8888
+    ports:
+     - 8888:8888
+    environment:
+     - GIT_USER=ndiayepi
+     - GIT_PASS=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
+  discovery-server:
+    image: discovery-image
+    container_name: discovery-server
+    command: 
+     - '20'
+    mem_limit: 512M
+    networks:
+     - petclinic_network
+    depends_on:
+     - config-server
+    expose:
+     - 8761
+    ports:
+     - 8761:8761
+  customer-service:
+    image: customers-image
+    container_name: customer-service
+    command: 
+     - '60'
+     - docker,mysql
+    mem_limit: 512M
+    networks:
+     - petclinic_network
+    depends_on:
+     - config-server
+     - discovery-server
+    expose:
+     - 8081
+    ports:
+     - 8081:8081
+
+  vets-service:
+    image: vets-image
+    container_name: vets-service
+    command: 
+     - '60'
+     - docker,mysql
+    mem_limit: 512M
+    networks:
+     - petclinic_network
+    depends_on:
+     - config-server
+     - discovery-server
+    expose:
+     - 8083
+    ports:
+     - 8083:8083
+
+  visits-service:
+    image: visits-image
+    container_name: visits-service
+    command: 
+     - '60'
+     - docker,mysql
+    mem_limit: 512M
+    networks:
+     - petclinic_network
+    depends_on:
+     - config-server
+     - discovery-server
+    expose:
+     - 8082
+    ports:
+     - 8082:8082
+  admin-server:
+    image: admin-image
+    container_name: admin-server
+    command: 
+     - '60'
+     - docker
+    mem_limit: 512M
+    networks:
+     - petclinic_network
+    depends_on:
+     - config-server
+     - discovery-server
+    expose:
+     - 9090
+    ports:
+     - 9090:9090
+
+  api-gateway:
+    image: api-gateway-image
+    container_name: api-gateway
+    command: 
+     - '60'
+     - docker
+    mem_limit: 512M
+    networks:
+     - petclinic_network
+    depends_on:
+     - config-server
+     - discovery-server
+    expose:
+     - 8080
+    ports:
+     - 8080:8080
+networks:
+  petclinic_network:
+    external: true

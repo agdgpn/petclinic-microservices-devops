@@ -1,0 +1,191 @@
+pipeline {
+    environment { // Variables d environnement
+        PETCLINIC_HOME           = "${PETCLINIC_HOME}"      // Racine projet petclinic
+        DOCKER_ID                = "agdgpn"                 // Identifiant docker hub
+        CONFIG_DOCKER_IMAGE      = "config-server-image"    // Image Config-server
+        DISCOVERY_DOCKER_IMAGE   = "discovery-server-image" // Image Discover-server
+        CUSTOMERS_DOCKER_IMAGE   = "discovery-server-image" // Image Customers-service
+        VETS_DOCKER_IMAGE        = "discovery-server-image" // Image Vets-service
+        VISITS_DOCKER_IMAGE      = "discovery-server-image" // Image Visits-service
+        ADMIN_DOCKER_IMAGE       = "discovery-server-image" // Image Admin-server
+        APIGATEWAY_DOCKER_IMAGE = "discovery-server-image" // Image Api-gateway
+        DOCKER_TAG = "v.${BUILD_ID}.0" // Tag docker pour les images correspondant au build courant, incrémenté à chaque nouveau build
+    }
+    
+    // Executé par n'importe quel agent.
+    agent any 
+    stages {
+        stage('Initialization'){ // Préparation de l'environnment
+            steps {
+                script {
+                    sh '''
+                    sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+                    sleep 1
+                    '''
+                }
+            }
+        }
+
+        // Etape de génération des images
+        stage('Docker Build'){ 
+            steps {
+                script {
+                sh '''
+                 cd $PETCLINIC_HOME 
+                 ./scripts/devops/remove_container_if_exists.sh config-server
+                 ./scripts/devops/remove_container_if_exists.sh discovery-server
+                 ./scripts/devops/remove_container_if_exists.sh customers-service
+                 ./scripts/devops/remove_container_if_exists.sh vets-service
+                 ./scripts/devops/remove_container_if_exists.sh visits-service
+                 ./scripts/devops/remove_container_if_exists.sh admin-server
+                 ./scripts/devops/remove_container_if_exists.sh api-gateway
+                 sleep 2
+                 ./scripts/devops/build_image2.sh $CONFIG_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $DISCOVERY_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $CUSTOMERS_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $VETS_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $VISITS_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $ADMIN_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $APIGATEWAY_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 sleep 2
+                '''
+                }
+            }
+        }
+
+        // Etape Execution Docker
+        stage('Execution Docker'){ // Test des image avant de les pousser vers le registre Docker Hub
+            steps {
+                script {
+                    sh '''
+                    docker-compose -f docker/devops/docker-compose.yml up -d
+                    sleep 200
+                    '''
+                }
+            }
+        }
+        // Etape Tests d'acceptation
+        stage('Test Acceptance'){ 
+            steps {
+                    script {
+                    sh '''
+                    curl  -X GET -i http://localhost:8080
+                    sleep 2
+                    curl  -X GET -i http://localhost:9090
+                    sleep 2
+                    docker-compose -f docker/devops/docker-compose.yml stop
+                    docker-compose -f docker/devops/docker-compose.yml stop
+                    '''
+                    }
+            }
+
+        }
+
+        // Envoi des images sur le registre Dockerhub
+        stage('Docker Push'){ 
+            environment
+            {
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Récupéraion du mot de passe Dockerhub depuis le secret "docker_hub_pass' enrgistré sur jenkins
+            }
+
+            steps {
+
+                script {
+                sh '''
+                docker login -u $DOCKER_ID -p $DOCKER_PASS
+                docker push $DOCKER_ID/$CONFIG_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$DISCOVERY_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$CUSTOMERS_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$VETS_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$VISITS_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$ADMIN_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$APIGATEWAY_DOCKER_IMAGE:$DOCKER_TAG
+                '''
+                }
+            }
+
+        }
+
+        // Déploiement sur l'environnement DEV
+        stage('Deploiement en dev'){
+            environment
+            {
+                KUBECONFIG = credentials("config") // Récupéraion du fichier secret appelé 'config' et enrgistré sur jenkins.
+            }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                cp microservices/values.yaml values.yml
+                cat values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                helm upgrade --install app microservices --values=values.yml --namespace dev
+                '''
+                }
+            }
+
+        }
+
+        // Déploiement sur l'environnement STAGING
+        stage('Deploiement en staging'){
+            environment
+            {
+                KUBECONFIG = credentials("config") // Récupéraion du fichier secret appelé 'config' et enrgistré sur jenkins.
+            }
+            steps {
+                script {
+                sh '''
+                rm -Rf .kube
+                mkdir .kube
+                ls
+                cat $KUBECONFIG > .kube/config
+                cp microservices/values.yaml values.yml
+                cat values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                helm upgrade --install app microservices --values=values.yml --namespace staging
+                '''
+                }
+            }
+
+        }
+        // Déploiement sur l'environnement de PROD
+        stage('Deploiement en prod'){
+            environment
+            {
+                KUBECONFIG = credentials("config") // Récupéraion du fichier secret appelé 'config' et enrgistré sur jenkins.
+            }
+            steps {
+                    // Génération d'un bouton avec un timout de 15 mn pour
+                    // confirmer manuellement le déploiement en prod
+                    timeout(time: 15, unit: "MINUTES") {
+                        input message: 'Do you want to deploy in production ?', ok: 'Yes'
+                    }
+
+                script {
+                    sh '''
+                    rm -Rf .kube
+                    mkdir .kube
+                    ls
+                    cat $KUBECONFIG > .kube/config
+                    cp microservices/values.yaml values.yml
+                    cat values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    helm upgrade --install app microservices --values=values.yml --namespace prod
+                    '''
+                }
+            }
+        }
+    }
+    // Traitements en cas d'échec dans une étape du pipeline.
+    post { 
+        failure {
+            echo "This will run if the job failed"
+            mail to: "pierrendiaye@gmail.com",
+            subject: "${env.JOB_NAME} - Build # ${env.BUILD_ID} has failed",
+            body: "For more info on the pipeline failure, check out the console output at ${env.BUILD_URL}"
+        }
+    }
+}

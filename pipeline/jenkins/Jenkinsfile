@@ -69,6 +69,7 @@ pipeline {
                 script {
                 sh '''
                  cd $PETCLINIC_HOME 
+                 ls
                  ./scripts/devops/remove_container_if_exists.sh config-server
                  ./scripts/devops/remove_container_if_exists.sh discovery-server
                  ./scripts/devops/remove_container_if_exists.sh customers-service

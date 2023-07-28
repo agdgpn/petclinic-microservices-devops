@@ -17,7 +17,7 @@ services:
      - GIT_USER=ndiayepi
      - GIT_PASS=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
   discovery-server:
-    image: discovery-image
+    image: agdgpn/discovery-image
     container_name: discovery-server
     command: 
      - '20'
@@ -31,7 +31,7 @@ services:
     ports:
      - 8761:8761
   customer-service:
-    image: customers-image
+    image: agdgpn/customers-image
     container_name: customer-service
     command: 
      - '60'
@@ -48,7 +48,7 @@ services:
      - 8081:8081
 
   vets-service:
-    image: vets-image
+    image: agdgpn/vets-image
     container_name: vets-service
     command: 
      - '60'
@@ -65,7 +65,7 @@ services:
      - 8083:8083
 
   visits-service:
-    image: visits-image
+    image: agdgpn/visits-image
     container_name: visits-service
     command: 
      - '60'
@@ -81,7 +81,7 @@ services:
     ports:
      - 8082:8082
   admin-server:
-    image: admin-image
+    image: agdgpn/admin-image
     container_name: admin-server
     command: 
      - '60'
@@ -98,7 +98,7 @@ services:
      - 9090:9090
 
   api-gateway:
-    image: api-gateway-image
+    image: agdgpn/api-gateway-image
     container_name: api-gateway
     command: 
      - '60'

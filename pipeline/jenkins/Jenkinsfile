@@ -65,6 +65,9 @@ pipeline {
 
         // Etape de génération des images
         stage('Docker Build'){ 
+            agent {
+                label "BUILD-EC2"
+            }
             steps {
                 script {
                 sh '''

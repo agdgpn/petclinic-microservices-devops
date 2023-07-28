@@ -15,16 +15,21 @@ pipeline {
     // Executé par n'importe quel agent.
     //agent any 
     
-    agent {
+    agent any
+    /*
+    {
         label params.AGENT == "any" ? "" : params.AGENT 
     }
 
     parameters {
         choice(name: "AGENT", choices: ["any", "docker", "windows", "linux"]) 
     }
+    */
     stages {
         stage('Initialization'){ // Préparation de l'environnment
-            agent windows
+            agent {
+                label "BUILD-EC2"
+            }
             steps {
                 script {
                     sh '''

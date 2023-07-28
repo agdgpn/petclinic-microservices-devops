@@ -1,6 +1,6 @@
 pipeline {
     environment { // Variables d environnement
-        PETCLINIC_HOME           = "${PWD}"      // Racine projet petclinic
+        PETCLINIC_HOME           = "/home/ubuntu/workspace/Petclinic"      // Racine projet petclinic
         DOCKER_ID                = "agdgpn"                 // Identifiant docker hub
         CONFIG_DOCKER_IMAGE      = "config-server-image"    // Image Config-server
         DISCOVERY_DOCKER_IMAGE   = "discovery-server-image" // Image Discover-server

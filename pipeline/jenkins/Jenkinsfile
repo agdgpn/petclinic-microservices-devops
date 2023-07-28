@@ -95,7 +95,10 @@ pipeline {
         }
 
         // Etape Execution Docker
-        stage('Execution Docker'){ // Test des image avant de les pousser vers le registre Docker Hub
+        stage('Execution Docker'){ // Test des image avant de les pousser vers le registre Docker Hub 
+            agent {
+                label "BUILD-EC2"
+            }
             steps {
                 script {
                     sh '''

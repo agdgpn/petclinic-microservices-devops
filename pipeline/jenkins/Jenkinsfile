@@ -114,6 +114,9 @@ pipeline {
         }
         // Etape Tests d'acceptation
         stage('Test Acceptance'){ 
+            agent {
+                label "BUILD-EC2"
+            }
             steps {
                     script {
                     sh '''

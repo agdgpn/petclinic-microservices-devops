@@ -2,7 +2,7 @@ version: '2'
 
 services:
   config-server:
-    image: config-image
+    image: agdgpn/config-image
     container_name: config-server
     mem_limit: 512M
     volumes:

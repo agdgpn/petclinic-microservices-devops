@@ -24,6 +24,7 @@ pipeline {
     }
     stages {
         stage('Initialization'){ // Préparation de l'environnment
+            agent windows
             steps {
                 script {
                     sh '''

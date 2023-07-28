@@ -13,7 +13,15 @@ pipeline {
     }
     
     // Executé par n'importe quel agent.
-    agent any 
+    //agent any 
+    
+    agent {
+        label params.AGENT == "any" ? "" : params.AGENT 
+    }
+
+    parameters {
+        choice(name: "AGENT", choices: ["any", "docker", "windows", "linux"]) 
+    }
     stages {
         stage('Initialization'){ // Préparation de l'environnment
             steps {

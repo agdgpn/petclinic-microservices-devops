@@ -117,11 +117,14 @@ pipeline {
             steps {
                     script {
                     sh '''
-                    curl  -X GET -i http://localhost:8080
+                    docker container run --network petclinic_network datascientest/curl:latest http://config-server:8888
                     sleep 2
-                    curl  -X GET -i http://localhost:9090
+                    docker container run --network petclinic_network datascientest/curl:latest http://discovery-server:8761
                     sleep 2
-                    docker-compose -f docker/devops/docker-compose.yml stop
+                    docker container run --network petclinic_network datascientest/curl:latest http://customer-service:8081
+                    sleep 2
+                    docker container run --network petclinic_network datascientest/curl:latest http://api-gateway:8080
+                    sleep 2
                     docker-compose -f docker/devops/docker-compose.yml stop
                     '''
                     }

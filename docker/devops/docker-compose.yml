@@ -1,12 +1,26 @@
 version: '2'
 
 services:
+  mysql-server:
+    image: mysql:5.7.8
+    container_name: mysql-server
+    networks:
+     - petclinic_network
+    expose:
+     - 3306
+    ports:
+     - 3306:3306
+    environment:
+     - MYSQL_ROOT_PASSWORD=petclinic
+     - MYSQL_DATABASE=petclinic
   config-server:
-    image: agdgpn/config-image
+    image: config-image
     container_name: config-server
-    mem_limit: 512M
     volumes:
-     - /home/pndiaye/petclinic/localrepo:/localrepo
+     - /tmp:/root
+    command: 
+     - '20'
+     - docker
     networks:
      - petclinic_network
     expose:
@@ -14,14 +28,16 @@ services:
     ports:
      - 8888:8888
     environment:
-     - GIT_USER=ndiayepi
-     - GIT_PASS=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
+     - GIT_USER=agdgpn
+     - GIT_PASS=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
   discovery-server:
-    image: agdgpn/discovery-image
+    image: discovery-image
     container_name: discovery-server
+    volumes:
+     - /tmp:/root
     command: 
      - '20'
-    mem_limit: 512M
+     - docker
     networks:
      - petclinic_network
     depends_on:
@@ -31,12 +47,13 @@ services:
     ports:
      - 8761:8761
   customer-service:
-    image: agdgpn/customers-image
+    image: customers-image
     container_name: customer-service
+    volumes:
+     - /tmp:/root
     command: 
-     - '60'
+     - '30'
      - docker,mysql
-    mem_limit: 512M
     networks:
      - petclinic_network
     depends_on:
@@ -47,63 +64,14 @@ services:
     ports:
      - 8081:8081
 
-  vets-service:
-    image: agdgpn/vets-image
-    container_name: vets-service
-    command: 
-     - '60'
-     - docker,mysql
-    mem_limit: 512M
-    networks:
-     - petclinic_network
-    depends_on:
-     - config-server
-     - discovery-server
-    expose:
-     - 8083
-    ports:
-     - 8083:8083
-
-  visits-service:
-    image: agdgpn/visits-image
-    container_name: visits-service
-    command: 
-     - '60'
-     - docker,mysql
-    mem_limit: 512M
-    networks:
-     - petclinic_network
-    depends_on:
-     - config-server
-     - discovery-server
-    expose:
-     - 8082
-    ports:
-     - 8082:8082
-  admin-server:
-    image: agdgpn/admin-image
-    container_name: admin-server
-    command: 
-     - '60'
-     - docker
-    mem_limit: 512M
-    networks:
-     - petclinic_network
-    depends_on:
-     - config-server
-     - discovery-server
-    expose:
-     - 9090
-    ports:
-     - 9090:9090
-
   api-gateway:
-    image: agdgpn/api-gateway-image
+    image: api-gateway-image
     container_name: api-gateway
+    volumes:
+     - /tmp:/root
     command: 
      - '60'
      - docker
-    mem_limit: 512M
     networks:
      - petclinic_network
     depends_on:

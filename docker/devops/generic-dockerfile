@@ -1,13 +1,12 @@
 FROM eclipse-temurin:17-jdk-alpine
 ARG APP
 ARG BASE_DIR
-ENV GIT_USER -
-ENV GIT_PASS -
+ENV GIT_USER ndiayepi
+ENV GIT_PASS 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
 WORKDIR /home/app/spring-petclinic-$APP
 COPY $BASE_DIR/.mvn /home/app/.mvn
 COPY $BASE_DIR/mvnw $BASE_DIR/pom.xml /home/app/
 COPY $BASE_DIR/spring-petclinic-$APP/ ./
-#RUN ../mvnw dependency:resolve
 COPY $BASE_DIR/scripts/devops/run_container_app.sh ./
 RUN chmod u+x run_container_app.sh
 ENTRYPOINT ["./run_container_app.sh"]

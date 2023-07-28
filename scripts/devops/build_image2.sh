@@ -8,13 +8,19 @@
 app=$1
 tag='latest'       # Valeur par défaut
 docker_id='agdgpn' # Valeur par défaut
+scope='dockerhub'  # Image destinee a etre poussee sur dockerhub
+# Usage: ./build_image2.sh <appli> <scope> <id> <tag>
 if [ $2 ]
 then
-  docker_id=$2
+  scope=$2
 fi
 if [ $3 ]
 then
-  tag=$3
+  docker_id=$3
+fi
+if [ $4 ]
+then
+  tag=$4
 fi
 get_suffix() {
   if [ $1 = 'config' ] || [ $1 = 'discovery' ] || [ $1 = 'admin' ]
@@ -46,8 +52,14 @@ then
     else
       app_full_name=$iApp
     fi
-    docker build / -t $docker_id/$iApp-image:$tag --build-arg BASE_DIR=$PETCLINIC_HOME \
-    --build-arg APP=$app_full_name -f $dock_path/generic-dockerfile
+    if [ $scope = dockerhub ]
+    then
+      docker build / -t $docker_id/$iApp-image:$tag --build-arg BASE_DIR=$PETCLINIC_HOME \
+      --build-arg APP=$app_full_name -f $dock_path/generic-dockerfile
+    else
+      docker build / -t $iApp-image:$tag --build-arg BASE_DIR=$PETCLINIC_HOME \
+      --build-arg APP=$app_full_name -f $dock_path/generic-dockerfile
+    fi
   done
 else
   echo "  - Generation de l'image de l'application '$app'"
@@ -58,6 +70,13 @@ else
   else
     app_full_name=$app
   fi
-  docker build / -t $docker_id/$app-image:$tag --build-arg BASE_DIR=$PETCLINIC_HOME \
-  --build-arg APP=$app_full_name -f $dock_path/generic-dockerfile
+  if [ $scope = dockerhub ]
+  then
+      docker build / -t $docker_id/$app-image:$tag --build-arg BASE_DIR=$PETCLINIC_HOME \
+      --build-arg APP=$app_full_name -f $dock_path/generic-dockerfile
+  else
+      docker build / -t $app-image:$tag --build-arg BASE_DIR=$PETCLINIC_HOME \
+      --build-arg APP=$app_full_name -f $dock_path/generic-dockerfile
+  fi
+
 fi

@@ -15,7 +15,7 @@ pipeline {
     // Executé par n'importe quel agent.
     //agent any 
     
-    //agent any
+    agent any
     /*
     {
         label params.AGENT == "any" ? "" : params.AGENT 

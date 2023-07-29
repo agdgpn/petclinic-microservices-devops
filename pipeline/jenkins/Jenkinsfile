@@ -120,7 +120,7 @@ pipeline {
                         docker network create --subnet 172.50.0.0/24 --gateway 172.50.0.1 ${NETWORK_NAME} ; 
                     fi
                     docker-compose -f docker/devops/docker-compose.yml up -d
-                    sleep 120
+                    sleep 40
                     '''
                 }
             }
@@ -134,11 +134,11 @@ pipeline {
                     script {
                     sh '''
                     docker container run --network petclinic_network datascientest/curl:latest http://config-server:8888
-                    sleep 2
+                    sleep 20
                     docker container run --network petclinic_network datascientest/curl:latest http://discovery-server:8761
-                    sleep 2
+                    sleep 20
                     docker container run --network petclinic_network datascientest/curl:latest http://customer-service:8081
-                    sleep 2
+                    sleep 20
                     docker container run --network petclinic_network datascientest/curl:latest http://api-gateway:8080
                     sleep 2
                     docker-compose -f docker/devops/docker-compose.yml stop

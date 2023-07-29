@@ -18,9 +18,6 @@ services:
     container_name: config-server
     volumes:
      - /tmp:/root
-    command: 
-     - '20'
-     - docker
     networks:
      - petclinic_network
     expose:

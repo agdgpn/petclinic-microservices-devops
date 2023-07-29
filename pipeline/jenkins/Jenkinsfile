@@ -137,10 +137,10 @@ pipeline {
                     curl --head -X GET --retry 10 --retry-connrefused --retry-delay 2 http://localhost:8888
                     
                     ./scripts/devops/wait-for-discovery.sh
-                    curl --head -X GET --retry 10 --retry-connrefused --retry-delay 2 http://localhost:8761
+                    curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8761
                     
                     ./scripts/devops/wait-for-customers.sh
-                    curl --head -X GET --retry 20 --retry-connrefused --retry-delay 2 http://localhost:8888
+                    curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8888
                     
                     ./scripts/devops/wait-for-api-gateway.sh
                     curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8080

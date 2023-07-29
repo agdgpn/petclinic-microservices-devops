@@ -133,7 +133,7 @@ pipeline {
             steps {
                     script {
                     sh '''
-                    ./scripts/devops/wait-for-message.sh "Started ConfigServerApplication in" config-server
+                    ./scripts/devops/wait-for-message.sh "'Started ConfigServerApplication in'" config-server
                     sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://config-server:8888
                     ./scripts/devops/wait-for-message.sh "Started DiscoveryServerApplication in" discovery-server

@@ -27,9 +27,6 @@ pipeline {
     */
     stages {
         stage('CLOUD-AGENT1 Initialization'){ // Préparation de l'environnment
-            agent {
-                label "CLOUD-AGENT1"
-            }
             steps {
                 script {
                     sh '''
@@ -79,9 +76,11 @@ pipeline {
 
         // Etape de génération des images de tests
         stage('Docker Build Test images'){ 
+            /*
             agent {
                 label "CLOUD-AGENT1"
             }
+            */
             steps {
                 script {
                 sh '''
@@ -100,9 +99,9 @@ pipeline {
 
         // Etape Execution Docker Pour tests
         stage('Execution Docker'){ // Test des image avant de les pousser vers le registre Docker Hub 
-            agent {
+           /* agent {
                 label "CLOUD-AGENT1"
-            }
+            }*/
             steps {
                 script {
                     sh '''
@@ -127,9 +126,10 @@ pipeline {
         }
         // Etape Tests d'acceptation
         stage('Test Acceptance'){ 
+            /*
             agent {
                 label "CLOUD-AGENT1"
-            }
+            }*/
             steps {
                     script {
                     sh '''
@@ -150,9 +150,9 @@ pipeline {
 
         // Etape de génération des images a deployer en dev/prod
         stage('Docker Build images'){ 
-            agent {
+            /*agent {
                 label "CLOUD-AGENT1"
-            }
+            }*/
             steps {
                 script {
                 sh '''
@@ -175,9 +175,9 @@ pipeline {
             {
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Récupéraion du mot de passe Dockerhub depuis le secret "docker_hub_pass' enrgistré sur jenkins
             }
-            agent {
+            /*agent {
                 label "CLOUD-AGENT1"
-            }
+            }*/
 
             steps {
 

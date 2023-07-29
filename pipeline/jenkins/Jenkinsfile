@@ -119,7 +119,7 @@ pipeline {
                         docker network create --subnet 172.50.0.0/24 --gateway 172.50.0.1 ${NETWORK_NAME} ; 
                     fi
                     docker-compose -f docker/devops/docker-compose.yml up -d
-                    sleep 140
+                    sleep 10
                     '''
                 }
             }
@@ -133,12 +133,21 @@ pipeline {
             steps {
                     script {
                     sh '''
+                    config-started = "Started ConfigServerApplication in"
+                    discovery-started = "Started DiscoveryServerApplication in"
+                    customers-up = "customers-service:8081 with status UP"
+                    api-gateway-up = "api-gateway:8080 with status UP"
+                    ./scripts/devops/wait-for-message.sh $config-started config-server
+                    sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://config-server:8888
-                    sleep 10
+                    ./scripts/devops/wait-for-message.sh $discovery-started discovery-server
+                    sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://discovery-server:8761
-                    sleep 10
+                    ./scripts/devops/wait-for-message.sh $customers-up discovery-server
+                    sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://customer-service:8081
-                    sleep 10
+                    ./scripts/devops/wait-for-message.sh $api-gateway-up discovery-server
+                    sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://api-gateway:8080
                     sleep 2
                     docker-compose -f docker/devops/docker-compose.yml stop
@@ -161,7 +170,7 @@ pipeline {
                  ./scripts/devops/build_image2.sh $CUSTOMERS_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
                  ./scripts/devops/build_image2.sh $VETS_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
                  ./scripts/devops/build_image2.sh $VISITS_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $ADMIN_DOCKER_IMAGE $DOCKER_ID dockerhub $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $ADMIN_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
                  ./scripts/devops/build_image2.sh $APIGATEWAY_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
                  sleep 2
                 '''

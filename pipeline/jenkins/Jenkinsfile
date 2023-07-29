@@ -133,16 +133,20 @@ pipeline {
             steps {
                     script {
                     sh '''
-                    ./scripts/devops/wait-for-message.sh "'Started ConfigServerApplication in'" config-server
+                    config-started = "Started ConfigServerApplication in"
+                    discovery-started = "Started DiscoveryServerApplication in"
+                    customers-up = "customers-service:8081 with status UP"
+                    api-gateway-up = "api-gateway:8080 with status UP"
+                    ./scripts/devops/wait-for-message.sh $config-started config-server
                     sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://config-server:8888
-                    ./scripts/devops/wait-for-message.sh "Started DiscoveryServerApplication in" discovery-server
+                    ./scripts/devops/wait-for-message.sh $discovery-started discovery-server
                     sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://discovery-server:8761
-                    ./scripts/devops/wait-for-message.sh "customers-service:8081 with status UP" discovery-server
+                    ./scripts/devops/wait-for-message.sh $customers-up discovery-server
                     sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://customer-service:8081
-                    ./scripts/devops/wait-for-message.sh "api-gateway:8080 with status UP" discovery-server
+                    ./scripts/devops/wait-for-message.sh $api-gateway-up discovery-server
                     sleep 2
                     docker container run --network petclinic_network datascientest/curl:latest http://api-gateway:8080
                     sleep 2

@@ -134,17 +134,15 @@ pipeline {
                     script {
                     sh '''
                     ./scripts/devops/wait-for-config.sh
-                    sleep 2
-                    curl http://localhost:8888
                     curl --head -X GET --retry 10 --retry-connrefused --retry-delay 2 http://localhost:8888
+                    
                     ./scripts/devops/wait-for-discovery.sh
-                    sleep 20
                     curl --head -X GET --retry 10 --retry-connrefused --retry-delay 2 http://localhost:8761
+                    
                     ./scripts/devops/wait-for-customers.sh
-                    sleep 15
                     curl --head -X GET --retry 20 --retry-connrefused --retry-delay 2 http://localhost:8888
+                    
                     ./scripts/devops/wait-for-api-gateway.sh
-                    sleep 20
                     curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8080
                     
                     docker-compose -f docker/devops/docker-compose.yml stop

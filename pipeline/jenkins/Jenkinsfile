@@ -28,18 +28,17 @@ pipeline {
     stages {
         stage('Initialization'){ // Préparation de l'environnment
             agent {
-                label "BUILD-EC2"
+                label "CLOUD-AGENT1 && CLOUD-AGENT2"
             }
             steps {
                 script {
                     sh '''
                     echo "Hello I am a Jenkins agent lauched from AWS at `date`"
                     if [ -x "$(command -v docker)" ]; then
-                        echo "Update docker"
-                        # command
+                        echo "docker is already installed!"
                     else
-                        echo "Install docker"
-                        # command
+                        echo "Installing docker ..."
+                        # Docker installation commands 
                         sudo apt-get update -y
                         sudo apt-get install ca-certificates curl gnupg -y
 
@@ -59,6 +58,20 @@ pipeline {
                        newgrp docker
                        sudo rm -rf ~/.gradle
                     fi
+                    if [ -x "$(command -v docker)" ]; then
+                        echo "Docker compose is already installed"
+                    else
+                        echo "Installing docker-compose ..."
+                        # Docker Compose installation command
+                        sudo apt install docker-compose -y
+                    fi
+                    if [ -x "$(command -v zip)" ]; then
+                        echo "Zip is already installed"
+                    else
+                        echo "Installing zip ..."
+                        # Zip installation command
+                        sudo apt install zip -y
+                    fi
                     '''
                 }
             }
@@ -67,7 +80,7 @@ pipeline {
         // Etape de génération des images de tests
         stage('Docker Build Test images'){ 
             agent {
-                label "BUILD-EC2"
+                label "CLOUD-AGENT1"
             }
             steps {
                 script {
@@ -88,7 +101,7 @@ pipeline {
         // Etape Execution Docker Pour tests
         stage('Execution Docker'){ // Test des image avant de les pousser vers le registre Docker Hub 
             agent {
-                label "BUILD-EC2"
+                label "CLOUD-AGENT1"
             }
             steps {
                 script {
@@ -115,7 +128,7 @@ pipeline {
         // Etape Tests d'acceptation
         stage('Test Acceptance'){ 
             agent {
-                label "BUILD-EC2"
+                label "CLOUD-AGENT1"
             }
             steps {
                     script {
@@ -138,7 +151,7 @@ pipeline {
         // Etape de génération des images a deployer en dev/prod
         stage('Docker Build images'){ 
             agent {
-                label "BUILD-EC2"
+                label "CLOUD-AGENT2"
             }
             steps {
                 script {
@@ -161,6 +174,9 @@ pipeline {
             environment
             {
                 DOCKER_PASS = credentials("DOCKER_HUB_PASS") // Récupéraion du mot de passe Dockerhub depuis le secret "docker_hub_pass' enrgistré sur jenkins
+            }
+            agent {
+                label "CLOUD-AGENT2"
             }
 
             steps {
@@ -203,29 +219,6 @@ pipeline {
             }
 
         }
-
-        // Déploiement sur l'environnement STAGING
-        stage('Deploiement en staging'){
-            environment
-            {
-                KUBECONFIG = credentials("config") // Récupéraion du fichier secret appelé 'config' et enrgistré sur jenkins.
-            }
-            steps {
-                script {
-                sh '''
-                rm -Rf .kube
-                mkdir .kube
-                ls
-                cat $KUBECONFIG > .kube/config
-                cp microservices/values.yaml values.yml
-                cat values.yml
-                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-                helm upgrade --install app microservices --values=values.yml --namespace staging
-                '''
-                }
-            }
-
-        }
         // Déploiement sur l'environnement de PROD
         stage('Deploiement en prod'){
             environment
@@ -255,6 +248,7 @@ pipeline {
         }
     }
     // Traitements en cas d'échec dans une étape du pipeline.
+    /*
     post { 
         failure {
             echo "This will run if the job failed"
@@ -263,4 +257,5 @@ pipeline {
             body: "For more info on the pipeline failure, check out the console output at ${env.BUILD_URL}"
         }
     }
+    */
 }

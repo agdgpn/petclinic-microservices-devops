@@ -136,7 +136,7 @@ pipeline {
         }
 
         // Etape de génération des images a deployer en dev/prod
-        stage('Docker Build Test images'){ 
+        stage('Docker Build images'){ 
             agent {
                 label "BUILD-EC2"
             }

@@ -58,7 +58,7 @@ pipeline {
                        newgrp docker
                        sudo rm -rf ~/.gradle
                     fi
-                    if [ -x "$(command -v docker)" ]; then
+                    if [ -x "$(command -v docker-compose)" ]; then
                         echo "Docker compose is already installed"
                     else
                         echo "Installing docker-compose ..."

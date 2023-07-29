@@ -119,7 +119,7 @@ pipeline {
                         docker network create --subnet 172.50.0.0/24 --gateway 172.50.0.1 ${NETWORK_NAME} ; 
                     fi
                     docker-compose -f docker/devops/docker-compose.yml up -d
-                    sleep 160
+                    sleep 140
                     '''
                 }
             }
@@ -184,13 +184,13 @@ pipeline {
                 script {
                 sh '''
                 docker login -u $DOCKER_ID -p $DOCKER_PASS
-                docker push $DOCKER_ID/$CONFIG_DOCKER_IMAGE:$DOCKER_TAG
-                docker push $DOCKER_ID/$DISCOVERY_DOCKER_IMAGE:$DOCKER_TAG
-                docker push $DOCKER_ID/$CUSTOMERS_DOCKER_IMAGE:$DOCKER_TAG
-                docker push $DOCKER_ID/$VETS_DOCKER_IMAGE:$DOCKER_TAG
-                docker push $DOCKER_ID/$VISITS_DOCKER_IMAGE:$DOCKER_TAG
-                docker push $DOCKER_ID/$ADMIN_DOCKER_IMAGE:$DOCKER_TAG
-                docker push $DOCKER_ID/$APIGATEWAY_DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_ID/$CONFIG_DOCKER_IMAGE-image:$DOCKER_TAG
+                docker push $DOCKER_ID/$DISCOVERY_DOCKER_IMAGE-image:$DOCKER_TAG
+                docker push $DOCKER_ID/$CUSTOMERS_DOCKER_IMAGE-image:$DOCKER_TAG
+                docker push $DOCKER_ID/$VETS_DOCKER_IMAGE-image:$DOCKER_TAG
+                docker push $DOCKER_ID/$VISITS_DOCKER_IMAGE-image:$DOCKER_TAG
+                docker push $DOCKER_ID/$ADMIN_DOCKER_IMAGE-image:$DOCKER_TAG
+                docker push $DOCKER_ID/$APIGATEWAY_DOCKER_IMAGE-image:$DOCKER_TAG
                 '''
                 }
             }

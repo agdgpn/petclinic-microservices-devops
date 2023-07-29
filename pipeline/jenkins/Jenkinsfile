@@ -119,7 +119,7 @@ pipeline {
                         docker network create --subnet 172.50.0.0/24 --gateway 172.50.0.1 ${NETWORK_NAME} ; 
                     fi
                     docker-compose -f docker/devops/docker-compose.yml up -d
-                    sleep 200
+                    sleep 160
                     '''
                 }
             }

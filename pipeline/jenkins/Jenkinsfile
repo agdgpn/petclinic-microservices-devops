@@ -64,38 +64,28 @@ pipeline {
             }
         }
 
-        // Etape de génération des images
-        stage('Docker Build'){ 
+        // Etape de génération des images de tests
+        stage('Docker Build Test images'){ 
             agent {
                 label "BUILD-EC2"
             }
             steps {
                 script {
                 sh '''
-                 cd $PETCLINIC_HOME 
-                 ls
-                 ./scripts/devops/remove_container_if_exists.sh config-server
-                 ./scripts/devops/remove_container_if_exists.sh discovery-server
-                 ./scripts/devops/remove_container_if_exists.sh customers-service
-                 ./scripts/devops/remove_container_if_exists.sh vets-service
-                 ./scripts/devops/remove_container_if_exists.sh visits-service
-                 ./scripts/devops/remove_container_if_exists.sh admin-server
-                 ./scripts/devops/remove_container_if_exists.sh api-gateway
-                 sleep 2
-                 ./scripts/devops/build_image2.sh $CONFIG_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $DISCOVERY_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $CUSTOMERS_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $VETS_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $VISITS_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $ADMIN_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
-                 ./scripts/devops/build_image2.sh $APIGATEWAY_DOCKER_IMAGE $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $CONFIG_DOCKER_IMAGE local
+                 ./scripts/devops/build_image2.sh $DISCOVERY_DOCKER_IMAGE local
+                 ./scripts/devops/build_image2.sh $CUSTOMERS_DOCKER_IMAGE local
+                 ./scripts/devops/build_image2.sh $VETS_DOCKER_IMAGE local
+                 ./scripts/devops/build_image2.sh $VISITS_DOCKER_IMAGE local
+                 ./scripts/devops/build_image2.sh $ADMIN_DOCKER_IMAGE local
+                 ./scripts/devops/build_image2.sh $APIGATEWAY_DOCKER_IMAGE local
                  sleep 2
                 '''
                 }
             }
         }
 
-        // Etape Execution Docker
+        // Etape Execution Docker Pour tests
         stage('Execution Docker'){ // Test des image avant de les pousser vers le registre Docker Hub 
             agent {
                 label "BUILD-EC2"
@@ -103,6 +93,15 @@ pipeline {
             steps {
                 script {
                     sh '''
+                   cd $PETCLINIC_HOME 
+                   ./scripts/devops/remove_container_if_exists.sh config-server
+                   ./scripts/devops/remove_container_if_exists.sh discovery-server
+                   ./scripts/devops/remove_container_if_exists.sh customers-service
+                   ./scripts/devops/remove_container_if_exists.sh vets-service
+                   ./scripts/devops/remove_container_if_exists.sh visits-service
+                   ./scripts/devops/remove_container_if_exists.sh admin-server
+                   ./scripts/devops/remove_container_if_exists.sh api-gateway
+                   sleep 2
                     NETWORK_NAME=petclinic_network
                     if [ -z $(docker network ls --filter name=^${NETWORK_NAME}$ --format="{{ .Name }}") ] ; then 
                         docker network create --subnet 172.50.0.0/24 --gateway 172.50.0.1 ${NETWORK_NAME} ; 
@@ -134,6 +133,27 @@ pipeline {
                     }
             }
 
+        }
+
+        // Etape de génération des images a deployer en dev/prod
+        stage('Docker Build Test images'){ 
+            agent {
+                label "BUILD-EC2"
+            }
+            steps {
+                script {
+                sh '''
+                 ./scripts/devops/build_image2.sh $CONFIG_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $DISCOVERY_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $CUSTOMERS_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $VETS_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $VISITS_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $ADMIN_DOCKER_IMAGE $DOCKER_ID dockerhub $DOCKER_TAG
+                 ./scripts/devops/build_image2.sh $APIGATEWAY_DOCKER_IMAGE dockerhub $DOCKER_ID $DOCKER_TAG
+                 sleep 2
+                '''
+                }
+            }
         }
 
         // Envoi des images sur le registre Dockerhub

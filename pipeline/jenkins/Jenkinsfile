@@ -73,7 +73,8 @@ pipeline {
                 }
             }
         }*/
-
+        
+        
         // Etape de génération des images de tests
         stage('Docker Build Test images'){ 
             /*

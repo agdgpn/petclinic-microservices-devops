@@ -204,10 +204,10 @@ pipeline {
                 mkdir .kube
                 ls
                 cat $KUBECONFIG > .kube/config
-                cp microservices/values.yaml values.yml
+                cp kubernetes/helm/config-server/values.yaml values.yml
                 cat values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-                helm upgrade --install app microservices --values=values.yml --namespace dev
+                helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --namespace dev
                 '''
                 }
             }
@@ -230,12 +230,11 @@ pipeline {
                     sh '''
                     rm -Rf .kube
                     mkdir .kube
-                    ls
                     cat $KUBECONFIG > .kube/config
-                    cp microservices/values.yaml values.yml
+                    cp kubernetes/helm/config-server/values.yaml values.yml
                     cat values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
-                    helm upgrade --install app microservices --values=values.yml --namespace prod
+                    helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --namespace prod
                     '''
                 }
             }

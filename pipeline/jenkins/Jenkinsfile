@@ -26,7 +26,7 @@ pipeline {
     }
     */
     stages {
-        stage('CLOUD-AGENT1 Initialization'){ // Préparation de l'environnment
+        /*stage('CLOUD-AGENT1 Initialization'){ // Préparation de l'environnment
             steps {
                 script {
                     sh '''
@@ -72,7 +72,7 @@ pipeline {
                     '''
                 }
             }
-        }
+        }*/
 
         // Etape de génération des images de tests
         stage('Docker Build Test images'){ 
@@ -140,7 +140,7 @@ pipeline {
                     curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8761
                     
                     ./scripts/devops/wait-for-customers.sh
-                    curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8888
+                    curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8081
                     
                     ./scripts/devops/wait-for-api-gateway.sh
                     curl --head -X GET --retry 30 --retry-connrefused --retry-delay 2 http://localhost:8080

@@ -205,8 +205,8 @@ pipeline {
                 ls
                 cat $KUBECONFIG > .kube/config
                 cp kubernetes/helm/config-server/values.yaml values.yml
-                cat values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
                 helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --namespace dev
                 '''
                 }
@@ -232,8 +232,8 @@ pipeline {
                     mkdir .kube
                     cat $KUBECONFIG > .kube/config
                     cp kubernetes/helm/config-server/values.yaml values.yml
-                    cat values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
                     helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --namespace prod
                     '''
                 }

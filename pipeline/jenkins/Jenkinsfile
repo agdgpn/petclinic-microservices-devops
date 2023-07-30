@@ -74,7 +74,7 @@ pipeline {
             }
         }*/
         
-        
+
         // Etape de génération des images de tests
         stage('Docker Build Test images'){ 
             /*
@@ -244,6 +244,7 @@ pipeline {
     // Traitements en cas d'échec dans une étape du pipeline.
     /*
     post { 
+        
         failure {
             echo "This will run if the job failed"
             mail to: "pierrendiaye@gmail.com",

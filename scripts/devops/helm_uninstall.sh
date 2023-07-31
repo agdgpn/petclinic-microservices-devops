@@ -29,11 +29,11 @@ then
   for iApp in $apps
   do
     echo "Desinstallation de l'application '$iApp'"
-    helm uninstall $iApp --namespace $namespace
+    helm uninstall $iApp --namespace $namespace || true
   done
 else
     echo "Desinstallation de l'application '$app'"
-    helm uninstall $app --namespace $namespace
+    helm uninstall $app --namespace $namespace || true
 fi
 
 

@@ -206,7 +206,7 @@ pipeline {
                 cat $KUBECONFIG > .kube/config                   
 
                 # Suppression namespace dev avant nouvelle installations
-                kubectl delete namespace dev
+                #kubectl delete namespace dev
 
                 # Config Server deployment
                 cp kubernetes/helm/config-server/values.yaml values.yml
@@ -276,7 +276,7 @@ pipeline {
                     cat $KUBECONFIG > .kube/config                      
 
                     # Suppression namespace prod avant nouvelle installations
-                    kubectl delete namespace prod        
+                    # kubectl delete namespace prod        
                     
                     # Config Server deployment
                     cp kubernetes/helm/config-server/values.yaml values.yml

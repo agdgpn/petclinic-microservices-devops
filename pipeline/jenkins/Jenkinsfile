@@ -242,6 +242,7 @@ pipeline {
                 helm upgrade --install admin-server kubernetes/helm/admin-server --values=values.yml --create-namespace --namespace dev
 
                 # Api-gateway deployment
+                kubectl apply -f kubernetes/standard/middleware.yml
                 cp kubernetes/helm/api-gateway/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml

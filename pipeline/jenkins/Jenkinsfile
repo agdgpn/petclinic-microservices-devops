@@ -225,10 +225,10 @@ pipeline {
                 helm upgrade --install discovery-server kubernetes/helm/discovery-server --values=values.yml --create-namespace --namespace dev
                 
                 # Test base de donnee Mysql
-                ip=$(kubectl get service/mysql-server -o jsonpath='{.spec.clusterIP}' -n dev)
-                sed -i "s+host = .*+host = $ip+g" scripts/devops/db-tools/my.cnf
-                ./scripts/devops/db-tools/connect2db.sh 
-                exit
+                #ip=$(kubectl get service/mysql-server -o jsonpath='{.spec.clusterIP}' -n dev)
+                #sed -i "s+host = .*+host = $ip+g" scripts/devops/db-tools/my.cnf
+                #./scripts/devops/db-tools/connect2db.sh 
+                #exit
 
                 # Customers Service deployment
                 cp kubernetes/helm/customers-service/values.yaml values.yml

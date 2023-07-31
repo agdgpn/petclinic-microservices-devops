@@ -203,12 +203,55 @@ pipeline {
                 sh '''
                 rm -Rf .kube
                 mkdir .kube
-                ls
                 cat $KUBECONFIG > .kube/config
+                # Mysql deployment
+                cp kubernetes/helm/mysql-server/values.yaml values.yml
+                #sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                #cat values.yml
+                helm upgrade --install mysql-server kubernetes/helm/mysql-server --values=values.yml --create-namespace --namespace dev                    
+                    
+                # Config Server deployment
                 cp kubernetes/helm/config-server/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 cat values.yml
-                helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --namespace dev
+                helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --create-namespace --namespace dev
+                   
+                # Discovery Server deployment
+                cp kubernetes/helm/discovery-server/values.yaml values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
+                helm upgrade --install discovery-server kubernetes/helm/discovery-server --values=values.yml --create-namespace --namespace dev
+                   
+                # Customers Service deployment
+                cp kubernetes/helm/customers-service/values.yaml values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
+                helm upgrade --install customers-service kubernetes/helm/customers-service --values=values.yml --create-namespace --namespace dev
+
+                # Vets Service deployment
+                cp kubernetes/helm/vets-service/values.yaml values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
+                helm upgrade --install vets-service kubernetes/helm/vets-service --values=values.yml --create-namespace --namespace dev
+
+                # Visits Service deployment
+                cp kubernetes/helm/visits-service/values.yaml values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
+                helm upgrade --install visits-service kubernetes/helm/visits-service --values=values.yml --create-namespace --namespace dev
+
+                # Admin Server deployment
+                cp kubernetes/helm/admin-server/values.yaml values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
+                helm upgrade --install admin-server kubernetes/helm/admin-server --values=values.yml --create-namespace --namespace dev
+
+                # Api-gateway deployment
+                cp kubernetes/helm/api-gateway/values.yaml values.yml
+                sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                cat values.yml
+                helm upgrade --install api-gateway kubernetes/helm/api-gateway --values=values.yml --create-namespace --namespace dev
+
                 '''
                 }
             }
@@ -232,10 +275,54 @@ pipeline {
                     rm -Rf .kube
                     mkdir .kube
                     cat $KUBECONFIG > .kube/config
+
+                    # Mysql deployment
+                    cp kubernetes/helm/mysql-server/values.yaml values.yml
+                    #sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    #cat values.yml
+                    helm upgrade --install mysql-server kubernetes/helm/mysql-server --values=values.yml --create-namespace --namespace prod                    
+                    
+                    # Config Server deployment
                     cp kubernetes/helm/config-server/values.yaml values.yml
                     sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                     cat values.yml
-                    helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --namespace prod
+                    helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --create-namespace --namespace prod
+                    
+                    # Discovery Server deployment
+                    cp kubernetes/helm/discovery-server/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
+                    helm upgrade --install discovery-server kubernetes/helm/discovery-server --values=values.yml --create-namespace --namespace prod
+                    
+                    # Customers Service deployment
+                    cp kubernetes/helm/customers-service/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
+                    helm upgrade --install customers-service kubernetes/helm/customers-service --values=values.yml --create-namespace --namespace prod
+
+                    # Vets Service deployment
+                    cp kubernetes/helm/vets-service/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
+                    helm upgrade --install vets-service kubernetes/helm/vets-service --values=values.yml --create-namespace --namespace prod
+
+                    # Visits Service deployment
+                    cp kubernetes/helm/visits-service/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
+                    helm upgrade --install visits-service kubernetes/helm/visits-service --values=values.yml --create-namespace --namespace prod
+
+                    # Admin Server deployment
+                    cp kubernetes/helm/admin-server/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
+                    helm upgrade --install admin-server kubernetes/helm/admin-server --values=values.yml --create-namespace --namespace prod
+
+                    # Api-gateway deployment
+                    cp kubernetes/helm/api-gateway/values.yaml values.yml
+                    sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
+                    cat values.yml
+                    helm upgrade --install api-gateway kubernetes/helm/api-gateway --values=values.yml --create-namespace --namespace prod
                     '''
                 }
             }

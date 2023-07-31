@@ -134,12 +134,14 @@ pipeline {
             steps {
                     script {
                     sh '''
+                    sed -i "s+host = .*+host = $(kubectl get service/mysql-server -o jsonpath='{.spec.clusterIP}' -n dev)+g" db-tools/my.cnf
+                    ./scripts/devops/db-tools/connect2db.sh 
+                    exit
+                    sleep 2
                     timeout 40s bash -c 'until curl http://localhost:8888; do sleep 4; done'
                     timeout 40s bash -c 'until curl http://localhost:8761; do sleep 4; done'
                     timeout 40s bash -c 'until curl http://localhost:8081; do sleep 4; done'
-                    timeout 40s bash -c 'until curl http://localhost:8080; do sleep 4; done'
-                    #./scripts/devops/wait_for_urls.sh http://localhost:8888 http://localhost:8761 http://localhost:8081 http://localhost:8080
-                                        
+                    timeout 40s bash -c 'until curl http://localhost:8080; do sleep 4; done'                                        
                     docker-compose -f docker/devops/docker-compose.yml stop
                     '''
                     }

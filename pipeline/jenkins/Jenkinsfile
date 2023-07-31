@@ -203,11 +203,7 @@ pipeline {
                 sh '''
                 rm -Rf .kube
                 mkdir .kube
-                cat $KUBECONFIG > .kube/config
-
-                # Mysql deployment
-                cp kubernetes/helm/mysql-server/values.yaml values.yml
-                helm upgrade --install mysql-server kubernetes/helm/mysql-server --values=values.yml --create-namespace --namespace dev                    
+                cat $KUBECONFIG > .kube/config                   
                     
                 # Config Server deployment
                 cp kubernetes/helm/config-server/values.yaml values.yml
@@ -273,11 +269,7 @@ pipeline {
                     sh '''
                     rm -Rf .kube
                     mkdir .kube
-                    cat $KUBECONFIG > .kube/config
-
-                    # Mysql deployment
-                    cp kubernetes/helm/mysql-server/values.yaml values.yml
-                    helm upgrade --install mysql-server kubernetes/helm/mysql-server --values=values.yml --create-namespace --namespace prod                    
+                    cat $KUBECONFIG > .kube/config           
                     
                     # Config Server deployment
                     cp kubernetes/helm/config-server/values.yaml values.yml

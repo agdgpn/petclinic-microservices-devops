@@ -226,7 +226,7 @@ pipeline {
                 
                 # Test base de donnee Mysql
                 ip=$(kubectl get service/mysql-server -o jsonpath='{.spec.clusterIP}' -n dev)
-                sed -i "s+host = .*+host = $ip+g" db-tools/my.cnf
+                sed -i "s+host = .*+host = $ip+g" scripts/devops/db-tools/my.cnf
                 ./scripts/devops/db-tools/connect2db.sh 
                 exit
 

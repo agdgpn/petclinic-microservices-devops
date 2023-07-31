@@ -134,9 +134,7 @@ pipeline {
             steps {
                     script {
                     sh '''
-                    sed -i "s+host = .*+host = $(kubectl get service/mysql-server -o jsonpath='{.spec.clusterIP}' -n dev)+g" db-tools/my.cnf
-                    ./scripts/devops/db-tools/connect2db.sh 
-                    exit
+                    
                     sleep 2
                     timeout 40s bash -c 'until curl http://localhost:8888; do sleep 4; done'
                     timeout 40s bash -c 'until curl http://localhost:8761; do sleep 4; done'
@@ -225,7 +223,13 @@ pipeline {
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
                 helm upgrade --install discovery-server kubernetes/helm/discovery-server --values=values.yml --create-namespace --namespace dev
-                   
+                
+                # Test base de donnee Mysql
+                ip=$(kubectl get service/mysql-server -o jsonpath='{.spec.clusterIP}' -n dev)
+                sed -i "s+host = .*+host = $ip+g" db-tools/my.cnf
+                ./scripts/devops/db-tools/connect2db.sh 
+                exit
+
                 # Customers Service deployment
                 cp kubernetes/helm/customers-service/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml

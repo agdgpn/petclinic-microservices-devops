@@ -204,47 +204,44 @@ pipeline {
                 rm -Rf .kube
                 mkdir .kube
                 cat $KUBECONFIG > .kube/config                   
-                    
+
+                # Suppression namespace dev avant nouvelle installations
+                kubectl dele namespace dev
+
                 # Config Server deployment
                 cp kubernetes/helm/config-server/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh config dev
                 helm upgrade --install config-server kubernetes/helm/config-server --values=values.yml --create-namespace --namespace dev
                    
                 # Discovery Server deployment
                 cp kubernetes/helm/discovery-server/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh discovery dev
                 helm upgrade --install discovery-server kubernetes/helm/discovery-server --values=values.yml --create-namespace --namespace dev
                    
                 # Customers Service deployment
                 cp kubernetes/helm/customers-service/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh customers dev
                 helm upgrade --install customers-service kubernetes/helm/customers-service --values=values.yml --create-namespace --namespace dev
 
                 # Vets Service deployment
                 cp kubernetes/helm/vets-service/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh vets dev
                 helm upgrade --install vets-service kubernetes/helm/vets-service --values=values.yml --create-namespace --namespace dev
 
                 # Visits Service deployment
                 cp kubernetes/helm/visits-service/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh visits dev
                 helm upgrade --install visits-service kubernetes/helm/visits-service --values=values.yml --create-namespace --namespace dev
 
                 # Admin Server deployment
                 cp kubernetes/helm/admin-server/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh admin dev
                 helm upgrade --install admin-server kubernetes/helm/admin-server --values=values.yml --create-namespace --namespace dev
 
                 # Api-gateway deployment
@@ -252,7 +249,6 @@ pipeline {
                 cp kubernetes/helm/api-gateway/values.yaml values.yml
                 sed -i "s+tag.*+tag: ${DOCKER_TAG}+g" values.yml
                 #cat values.yml
-                ./scripts/devops/helm_uninstall.sh api-gateway dev
                 helm upgrade --install api-gateway kubernetes/helm/api-gateway --values=values.yml --create-namespace --namespace dev
 
                 '''
@@ -277,7 +273,10 @@ pipeline {
                     sh '''
                     rm -Rf .kube
                     mkdir .kube
-                    cat $KUBECONFIG > .kube/config           
+                    cat $KUBECONFIG > .kube/config                      
+
+                    # Suppression namespace prod avant nouvelle installations
+                    kubectl dele namespace prod        
                     
                     # Config Server deployment
                     cp kubernetes/helm/config-server/values.yaml values.yml

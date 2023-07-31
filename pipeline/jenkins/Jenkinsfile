@@ -126,7 +126,7 @@ pipeline {
             }
         }
         // Etape Tests d'acceptation
-        stage('Test Acceptance'){ 
+        stage('Apps healthy check'){ 
             /*
             agent {
                 label "CLOUD-AGENT1"
@@ -134,7 +134,11 @@ pipeline {
             steps {
                     script {
                     sh '''
-                    ./scripts/devops/wait_for_urls.sh http://localhost:8888 http://localhost:8761 http://localhost:8081 http://localhost:8080
+                    timeout 30s bash -c 'until curl http://localhost:8888; do sleep 1; done'
+                    timeout 30s bash -c 'until curl http://localhost:8761; do sleep 1; done'
+                    timeout 30s bash -c 'until curl http://localhost:8081; do sleep 1; done'
+                    timeout 30s bash -c 'until curl http://localhost:8080; do sleep 1; done'
+                    #./scripts/devops/wait_for_urls.sh http://localhost:8888 http://localhost:8761 http://localhost:8081 http://localhost:8080
                                         
                     docker-compose -f docker/devops/docker-compose.yml stop
                     '''

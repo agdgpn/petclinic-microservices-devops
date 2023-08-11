@@ -35,7 +35,7 @@ then
   done
 else
   #appPath=../../kubernetes/helm/$app
-  appPath=/home/jenkins/agent/workspace/pipeline2/kubernetes/helm/$app
+  appPath=/home/jenkins/agent/workspace/pipeline3/kubernetes/helm/$app
   cp $appPath/values.yaml values.yml
   echo "Installation de l'application '$app'"
   helm upgrade --install $app $appPath --values=values.yml --namespace $namespace

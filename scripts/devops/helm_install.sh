@@ -34,7 +34,8 @@ then
     helm upgrade --install $iApp $appPath --values=values.yml --namespace $namespace
   done
 else
-  appPath=../../kubernetes/helm/$app
+  #appPath=../../kubernetes/helm/$app
+  appPath=/home/jenkins/agent/workspace/pipeline2/kubernetes/helm/$app
   cp $appPath/values.yaml values.yml
   echo "Installation de l'application '$app'"
   helm upgrade --install $app $appPath --values=values.yml --namespace $namespace

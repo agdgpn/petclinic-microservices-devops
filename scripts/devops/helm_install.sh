@@ -29,7 +29,8 @@ then
   for iApp in $apps
   do
     echo "Installation de l'application '$iApp'"
-    appPath=../../kubernetes/helm/$iApp
+    #appPath=../../kubernetes/helm/$iApp
+    appPath=/home/jenkins/agent/workspace/pipeline2/kubernetes/helm/$iApp
     cp $appPath/values.yaml values.yml
     helm upgrade --install $iApp $appPath --values=values.yml --namespace $namespace
   done
